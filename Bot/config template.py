@@ -8,11 +8,11 @@ Created on Thu Apr 23 10:31:14 2020
 
 
 INFO = {
-    "driver": "geckodriver",
-    "product": "Thermal Zip Up Hooded Sweatshirt",
-    "color": "Tangerine",
-    "size": "Medium",
-    "category": "sweatshirts",
+    "driver": "chromedriver",
+    "product" : ["Giro","Heller","Mug"],
+    "color": "",
+    "size": "",
+    "category": "accessories",
     "namefield": "example",
     "emailfield": "example@example.com",
     "phonefield": "XXXXXXXXXX",
