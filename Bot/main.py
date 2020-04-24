@@ -88,10 +88,9 @@ class supremeBot(object):
                 time.sleep(.1)
                 self.checkoutFunc()
             except:
-                time.sleep(1)
+                time.sleep(.892)
+                print("trying to add to cart again")
                 self.addToCart()
-            else:
-                print("Failed adding to cart")
         except:
             print("OOS, Checking diff color")
             self.info['color']=""
@@ -107,7 +106,7 @@ class supremeBot(object):
         self.b.fill("order[tel]", self.info['phonefield'])
 
         self.b.fill("order[billing_address]", self.info['addressfield'])
-        self.b.fill("order[billing_city]", self.info['city'])
+        #self.b.fill("order[billing_city]", self.info['city'])
         self.b.fill("order[billing_zip]", self.info['zip'])
         self.b.select("order[billing_country]", self.info['country'])
 
