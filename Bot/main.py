@@ -1,17 +1,38 @@
-#test develope
 #!/usr/bin/env python3
 import requests
 import bs4 as bs
 from splinter import Browser
-from splinter import request_handler
 import helpers
 import time
 import config
-
+import threading
+import ctypes
+      
 
 class supremeBot(object):
     path = ""
     linksToAvoid = []
+    class myThread (threading.Thread):     
+        def __init__(self, threadID, name, value, b):
+           threading.Thread.__init__(self)
+           self.threadID = threadID
+           self.name = name
+           self.b = b
+           self.value = value
+           
+        def run(self):
+            self.b.fill(self.name, self.value)
+            while (True):
+                print(config.INFO['namefield'])
+                print(self.name)
+            
+        def raise_exception(self): 
+            thread_id = self.threadID
+            res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
+                  ctypes.py_object(SystemExit)) 
+            if res > 1: 
+                ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
+                print('Exception raise failure') 
     
     def __init__(self, **info):
         self.base_url = 'http://www.supremenewyork.com/'
@@ -85,24 +106,21 @@ class supremeBot(object):
             
         try:
             self.b.find_by_value('add to cart').click()
-            try:
-                time.sleep(.1)
-                self.checkoutFunc()
-            except:
-                time.sleep(.892)
-                print("trying to add to cart again")
-                self.addToCart()
+            time.sleep(.1)
         except:
             print("OOS, Checking diff color")
             self.info['color']=""
             self.linksToAvoid.append(self.final_link)
             self.findProduct()
             self.addToCart()
+        self.checkoutFunc()
 
     def checkoutFunc(self):
         self.b.visit("{}{}".format(self.base_url, self.checkout))
 
-        self.b.fill("order[billing_name]", self.info['namefield'])
+        #self.b.fill("order[billing_name]", self.info['namefield'])
+        thread1 = self.myThread(1, "order[billing_name]",self.info['namefield'],self.b)
+        thread1.start()
         self.b.fill("order[email]", self.info['emailfield'])
         self.b.fill("order[tel]", self.info['phonefield'])
 
@@ -119,7 +137,9 @@ class supremeBot(object):
         self.b.find_by_css('.terms').click()
         
         self.b.find_by_value("process payment").click()
-    
+        thread1.raise_exception() 
+        thread1.join()
+        
     def quitBot(self):
         self.b.quit()
 
