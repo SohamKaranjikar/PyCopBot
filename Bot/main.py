@@ -6,39 +6,38 @@ import helpers
 import time
 import config
 import threading
-import ctypes
-      
+
+
+class botThread (threading.Thread):     
+    def __init__(self, threadID):
+        threading.Thread.__init__(self)
+        self.Bot = supremeBot(**config.INFO)
+    def run(self):
+        found_product = False
+        max_iter = 20
+        counter = 1
+        while not found_product:
+            found_product = self.Bot.findProduct()
+            print("Tried ", counter, " times")
+            counter += 1
+            time.sleep(.892)
+            self.Bot.linksToAvoid = []
+        if not found_product:
+            raise Exception("Couldn't find product. Sry bruh")
+        self.Bot.initializeBrowser()
+        self.Bot.addToCart()
+        self.Bot.checkoutFunc()
+
+
+def __init__(self, **info):
+    self.base_url = 'http://www.supremenewyork.com/'
+    self.shop = 'shop/all/'
+    self.checkout = 'checkout/'
+    self.info = info      
 
 class supremeBot(object):
     path = ""
     linksToAvoid = []
-    class myThread (threading.Thread):     
-        def __init__(self, threadID, name, value, b):
-           threading.Thread.__init__(self)
-           self.threadID = threadID
-           self.name = name
-           self.b = b
-           self.value = value
-           
-        def run(self):
-            self.b.fill(self.name, self.value)
-            while (True):
-                print(config.INFO['namefield'])
-                print(self.name)
-            
-        def raise_exception(self): 
-            thread_id = self.threadID
-            res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
-                  ctypes.py_object(SystemExit)) 
-            if res > 1: 
-                ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
-                print('Exception raise failure') 
-    
-    def __init__(self, **info):
-        self.base_url = 'http://www.supremenewyork.com/'
-        self.shop = 'shop/all/'
-        self.checkout = 'checkout/'
-        self.info = info
 
     def initializeBrowser(self):
         global path
@@ -113,14 +112,11 @@ class supremeBot(object):
             self.linksToAvoid.append(self.final_link)
             self.findProduct()
             self.addToCart()
-        self.checkoutFunc()
 
     def checkoutFunc(self):
         self.b.visit("{}{}".format(self.base_url, self.checkout))
 
-        #self.b.fill("order[billing_name]", self.info['namefield'])
-        thread1 = self.myThread(1, "order[billing_name]",self.info['namefield'],self.b)
-        thread1.start()
+        self.b.fill("order[billing_name]", self.info['namefield'])
         self.b.fill("order[email]", self.info['emailfield'])
         self.b.fill("order[tel]", self.info['phonefield'])
 
@@ -137,27 +133,28 @@ class supremeBot(object):
         self.b.find_by_css('.terms').click()
         
         self.b.find_by_value("process payment").click()
-        thread1.raise_exception() 
-        thread1.join()
-        
     def quitBot(self):
         self.b.quit()
 
 
 if __name__ == "__main__":
     
-    BOT = supremeBot(**config.INFO)
-    # Flag to set to true if you want to reload the page continously close to drop.
-    found_product = False
-    max_iter = 20
-    counter = 1
-    while not found_product:
-        found_product = BOT.findProduct()
-        print("Tried ", counter, " times")
-        counter += 1
-        time.sleep(.892)
-        BOT.linksToAvoid = []
-    if not found_product:
-        raise Exception("Couldn't find product. Sry bruh")
-    BOT.initializeBrowser()
-    BOT.addToCart()
+    # BOT = supremeBot(**config.INFO)
+    # # Flag to set to true if you want to reload the page continously close to drop.
+    # found_product = False
+    # max_iter = 20
+    # counter = 1
+    # while not found_product:
+    #     found_product = BOT.findProduct()
+    #     print("Tried ", counter, " times")
+    #     counter += 1
+    #     time.sleep(.892)
+    #     BOT.linksToAvoid = []
+    # if not found_product:
+    #     raise Exception("Couldn't find product. Sry bruh")
+    # BOT.initializeBrowser()
+    # BOT.addToCart()
+    # BOT.checkoutFunc()
+    bot1 = botThread(1)
+    bot1.start()
+
