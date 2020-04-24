@@ -2,7 +2,6 @@
 import requests
 import bs4 as bs
 from splinter import Browser
-from splinter import request_handler
 import helpers
 import time
 import config
