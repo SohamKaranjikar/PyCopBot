@@ -2,6 +2,7 @@
 import requests
 import bs4 as bs
 from splinter import Browser
+from splinter import request_handler
 import helpers
 import time
 import config
@@ -10,6 +11,7 @@ import config
 class supremeBot(object):
     path = ""
     linksToAvoid = []
+    
     def __init__(self, **info):
         self.base_url = 'http://www.supremenewyork.com/'
         self.shop = 'shop/all/'
@@ -69,7 +71,7 @@ class supremeBot(object):
         except:
             return False
 
-    def visitSite(self):
+    def addToCart(self):
         self.b.visit(
             "{}{}".format(
                 self.base_url, str(
@@ -80,19 +82,22 @@ class supremeBot(object):
         else:
             self.b.find_option_by_text(self.info['size']).click()
             
-        try:    
+        try:
             self.b.find_by_value('add to cart').click()
             try:
+                time.sleep(.1)
                 self.checkoutFunc()
             except:
                 time.sleep(1)
-                self.visitSite()
+                self.addToCart()
+            else:
+                print("Failed adding to cart")
         except:
             print("OOS, Checking diff color")
             self.info['color']=""
             self.linksToAvoid.append(self.final_link)
             self.findProduct()
-            self.visitSite()
+            self.addToCart()
 
     def checkoutFunc(self):
         self.b.visit("{}{}".format(self.base_url, self.checkout))
@@ -106,13 +111,13 @@ class supremeBot(object):
         self.b.fill("order[billing_zip]", self.info['zip'])
         self.b.select("order[billing_country]", self.info['country'])
 
-        #self.b.select("credit_card[type]", self.info['card'])
-        # self.b.find_by_text("number").fill(self.info['number'])
         self.b.fill("riearmxa", self.info['number'])
         self.b.select("credit_card[month]", self.info['month'])
         self.b.select("credit_card[year]", self.info['year'])
         self.b.fill("credit_card[meknk]", self.info['ccv'])
+        
         self.b.find_by_css('.terms').click()
+        
         self.b.find_by_value("process payment").click()
     
     def quitBot(self):
@@ -135,4 +140,4 @@ if __name__ == "__main__":
     if not found_product:
         raise Exception("Couldn't find product. Sry bruh")
     BOT.initializeBrowser()
-    BOT.visitSite()
+    BOT.addToCart()
