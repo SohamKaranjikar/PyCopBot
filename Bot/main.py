@@ -6,12 +6,13 @@ import helpers
 import time
 import config
 import threading
+import sys
 
 
 class botThread (threading.Thread):     
     def __init__(self, threadID):
         threading.Thread.__init__(self)
-        self.Bot = supremeBot(**config.INFO)
+        self.Bot = supremeBot(**config.INFOTEMP)
     def run(self):
         found_product = False
         max_iter = 20
@@ -38,6 +39,12 @@ def __init__(self, **info):
 class supremeBot(object):
     path = ""
     linksToAvoid = []
+    
+    def __init__(self, **info):
+        self.base_url = 'http://www.supremenewyork.com/'
+        self.shop = 'shop/all/'
+        self.checkout = 'checkout/'
+        self.info = info
 
     def initializeBrowser(self):
         global path
@@ -105,7 +112,7 @@ class supremeBot(object):
             
         try:
             self.b.find_by_value('add to cart').click()
-            time.sleep(.1)
+            time.sleep(.2)
         except:
             print("OOS, Checking diff color")
             self.info['color']=""
@@ -157,4 +164,9 @@ if __name__ == "__main__":
     # BOT.checkoutFunc()
     bot1 = botThread(1)
     bot1.start()
+    
+    bot2 = botThread(2)
+    bot2.start()
+    
+    sys.exit()
 
